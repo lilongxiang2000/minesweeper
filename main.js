@@ -34,7 +34,6 @@ const gameState = {
   minesCount: config.minesCount[config.level],
 }
 
-
 // 第一次加载就尝试读取配置
 $(`#level option[value="${config.level}"]`).prop('selected', true)
 // 取消默认行为 拖拽图片 默认行为
@@ -68,10 +67,10 @@ $('#level').change(e => {
 $('#btn_top').click(() => {
   console.log(topScore[config.level])
   alert(`
-    模式：${['简单', '中等', '困难'][config.level]}\n
-    TOP1: ${topScore[config.level][0]}s\n
-    TOP2: ${topScore[config.level][1]}s\n
-    TOP3: ${topScore[config.level][2]}s
+    模式：${['初级', '中级', '高级'][config.level]}\n
+    TOP1: ${topScore[config.level][0] || Infinity} s\n
+    TOP2: ${topScore[config.level][1] || Infinity} s\n
+    TOP3: ${topScore[config.level][2] || Infinity} s
   `)
 })
 
@@ -154,11 +153,11 @@ function init() {
     }[state]
   }
 
-  __map = creatRandomMap()
+  __map = createRandomMap()
   drawElMap(__map)
 }
 
-function creatRandomMap() {
+function createRandomMap() {
   let level = config.level,
     x = config.allCount[level][0],
     y = config.allCount[level][1],
@@ -170,31 +169,30 @@ function creatRandomMap() {
       (i < minesCount) ? true : false,
     )
   }
-  return arrayTo2DArrat(shuffle(map), x, y)
-
-  // 一维数组转二维
-  function arrayTo2DArrat(arr, x, y) {
-    let newArr = []
-    for (let i = 0; i < x; i++) {
-      newArr[i] = []
-      for (let j = 0; j < y; j++) {
-        newArr[i][j] = arr[i * y + j]
-      }
-    }
-    return newArr
-  }
-
-  function shuffle(arr) {
-    let random, newArr = []
-    while (arr.length) {
-      random = Math.random() * arr.length >> 0
-      newArr.push(arr[random])
-      arr.splice(random, 1)
-    }
-    return newArr
-  }
+  return arrayTo2DArray(shuffle(map), x, y)
 }
 
+// 一维数组转二维
+function arrayTo2DArray(arr, x, y) {
+  let newArr = []
+  for (let i = 0; i < x; i++) {
+    newArr[i] = []
+    for (let j = 0; j < y; j++) {
+      newArr[i][j] = arr[i * y + j]
+    }
+  }
+  return newArr
+}
+
+function shuffle(arr) {
+  let random, newArr = []
+  while (arr.length) {
+    random = Math.random() * arr.length >> 0
+    newArr.push(arr[random])
+    arr.splice(random, 1)
+  }
+  return newArr
+}
 class Mines {
   constructor(isMines) {
     this.isMines = isMines
@@ -323,7 +321,7 @@ function openMines(i, j) {
     __map[i][j].isOpen
   ) return
 
-  let count = getAroundMiness(i, j)
+  let count = getAroundMines(i, j)
   elMap[i][j].src = `images/mines-state/${count}.png`
   __map[i][j].isOpen = true
 
@@ -336,7 +334,7 @@ function openMines(i, j) {
   }
 }
 
-function getAroundMiness(i, j) {
+function getAroundMines(i, j) {
   let count = 0
 
   if (__map[i - 1]?.[j]?.isMines) count++
